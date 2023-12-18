@@ -2,6 +2,7 @@ const fs = require('fs')
 const readline = require('readline')
 const path = require('path')
 const { rFact, compareObject } = require('../lib/lib')
+const _ = require('lodash')
 
 const inputFilePath = 'input-test.txt'
 // const inputFilePath = 'input.txt'
