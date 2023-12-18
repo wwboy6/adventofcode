@@ -3,32 +3,58 @@ const readline = require('readline')
 const path = require('path')
 const { rFact, compareObject } = require('../lib/lib')
 
-const inputFilePath = 'input-test.txt'
-// const inputFilePath = 'input.txt'
+// const inputFilePath = 'input-test.txt'
+const inputFilePath = 'input.txt'
 const muteFlags = [false, false, false, ]
 
-async function coreFunction(data) {
-  let result = -1
+// async function coreFunction(data) {
+//   let result = -1
 
-  await recordOutput([data], result)
-  return result
+//   await recordOutput([data], result)
+//   return result
+// }
+
+function v2AddMul (v0, v1, mul) {
+  return { x: v0.x + v1.x * mul, y: v0.y + v1.y * mul }
+}
+
+let dirV = {
+  'U': { x: 0, y: -1 },
+  'D': { x: 0, y: 1 },
+  'R': { x: 1, y: 0 },
+  'L': { x: -1, y: 0 },
 }
 
 async function main () {
+
   const file = fs.createReadStream(path.resolve(__dirname, inputFilePath))
   const rl = readline.createInterface({
     input: file,
     crlfDelay: Infinity,
   })
 
+  let previuosPoint = {x: 0, y: 0}
+  let edgeCount = 0
+  let area = 0
   for await (const line of rl) {
-
+    let [, dir, dist, color] = line.match(/(.) (.+) \(#(.+)\)/)
+    debugLog("!!!!")
+    debugLog({dir, dist, color})
+    let dirVec = dirV[dir]
+    dist = Number.parseInt(dist)
+    edgeCount += dist
+    let pt = v2AddMul(previuosPoint, dirVec, dist)
+    debugLog({pt})
+    area += (previuosPoint.x * pt.y - pt.x * previuosPoint.y) / 2
+    previuosPoint = pt
   }
 
-  // debugLog('hi')
+  debugLog({ edgeCount, area })
+
+  let answer = area + (edgeCount / 2) + 1
 
   console.log('====')
-  // console.log({sum})
+  console.log({answer})
 
 }
 
@@ -64,6 +90,6 @@ async function recordOutput(args, output) {
 
 main();
 
-module.exports = {
-  coreFunction,
-}
+// module.exports = {
+//   coreFunction,
+// }
