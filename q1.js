@@ -15,17 +15,19 @@ async function coreFunction(data) {
 }
 
 async function main () {
-  const file = fs.createReadStream(path.resolve(__dirname, inputFilePath))
-  const rl = readline.createInterface({
-    input: file,
-    crlfDelay: Infinity,
-  })
+  const filePath = path.resolve(__dirname, inputFilePath)
 
-  for await (const line of rl) {
+  // const file = fs.createReadStream(filePath)
+  // const rl = readline.createInterface({
+  //   input: file,
+  //   crlfDelay: Infinity,
+  // })
+  // for await (const line of rl) {
+  // }
 
-  }
+  const dataStr = await fs.promises.readFile(filePath, 'utf8')
 
-  // debugLog('hi')
+  debugLog({dataStr})
 
   console.log('====')
   // console.log({sum})
