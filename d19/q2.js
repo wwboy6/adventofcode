@@ -82,7 +82,7 @@ function resolveRange(range, ruleDatas, key, level) {
     }
     if (!rule.condition) break
     newRange = rangeAnd(newRange, condNot(rule.condition))
-    if (!rangeCount(rc)) break
+    if (!rangeCount(newRange)) break
   }
   return sum
 }
