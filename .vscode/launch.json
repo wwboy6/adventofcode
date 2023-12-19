@@ -11,7 +11,7 @@
       "skipFiles": [
         "<node_internals>/**"
       ],
-      "program": "${workspaceFolder}/d17/q2.js"
+      "program": "${file}"
     }
   ]
 }
