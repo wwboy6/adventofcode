@@ -26,9 +26,10 @@ async function main () {
   // for await (const line of rl) {
   // }
 
-  const dataStr = await fs.promises.readFile(filePath, 'utf8')
+  // const dataStr = await fs.promises.readFile(filePath, 'utf8')
 
-  debugLog({dataStr})
+  const line = fs.readFileSync(process.stdin.fd).toString().split("\n");
+  debugLog({line})
 
   console.log('====')
   // console.log({sum})
