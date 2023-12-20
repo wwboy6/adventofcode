@@ -1,7 +1,7 @@
 const fs = require('fs')
 const readline = require('readline')
 const path = require('path')
-const { rFact, compareObject } = require('../lib/lib')
+const lib = require('../lib/lib')
 const _ = require('lodash')
 
 const inputFilePath = 'input-test.txt'
@@ -26,10 +26,10 @@ async function main () {
   // for await (const line of rl) {
   // }
 
-  // const dataStr = await fs.promises.readFile(filePath, 'utf8')
+  const dataStr = await fs.promises.readFile(filePath, 'utf8')
 
-  const line = fs.readFileSync(process.stdin.fd).toString().split("\n");
-  debugLog({line})
+  // const line = fs.readFileSync(process.stdin.fd).toString().split("\n");
+  // debugLog({line})
 
   console.log('====')
   // console.log({sum})
