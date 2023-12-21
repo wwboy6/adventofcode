@@ -27,9 +27,11 @@ async function main () {
   // }
 
   const dataStr = await fs.promises.readFile(filePath, 'utf8')
+  const lines = dataStr.replace('\r', '').split('\n')
 
-  // const line = fs.readFileSync(process.stdin.fd).toString().split("\n");
-  // debugLog({line})
+  // const lines = fs.readFileSync(process.stdin.fd).toString().replace('\r', '').split("\n");
+
+  debugLog({lines})
 
   console.log('====')
   // console.log({sum})
