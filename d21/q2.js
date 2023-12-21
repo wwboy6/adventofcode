@@ -5,13 +5,13 @@ const lib = require('../lib/lib')
 const _ = require('lodash')
 const { subscribe } = require('diagnostics_channel')
 
-const inputFilePath = 'input-test.txt'
-const totalCount = 2
+// const inputFilePath = 'input-test.txt'
+// const totalCount = 7
 
-// const inputFilePath = 'input.txt'
-// const totalCount = 26501365
+const inputFilePath = 'input.txt'
+const totalCount = 26501365
 
-const muteFlags = [false, false, false, ]
+const muteFlags = [true, true, false, ]
 
 async function coreFunction(data) {
   let result = -1
@@ -109,28 +109,29 @@ function sumLinearRepeatingParts(emptyMap, positions, totalCount, loopStart, isS
   if (totalCount < loopStart) return 0
   const totalCountIsEven = totalCount % 2 === 0
   let sum = 0
-  previousPosition = {}
+  let previousPosition = {}
   let { sumEven, sumOdd, stepsToFull } = processMap(emptyMap, positions, previousPosition, Infinity)
   debugLog1({sumEven, sumOdd, stepsToFull})
-  // totalCount - halfMapWidth - 1
-  // even
-  // Math.floor((totalCount - halfMapWidth - 1) / mapWidth)
-  let level = 0
-  for (let i = loopStart; i < totalCount; i += mapWidth) {
+  let level = 1
+  for (let i = loopStart; i <= totalCount; i += mapWidth) {
     let subSum
-    const isEvenStart = i % 2 === 0
-    const localStepCount = totalCount - i
-
-    if (localStepCount < stepsToFull) {
-      let {sumEven: subSumEven, sumOdd: subSumOdd} = processMap(emptyMap, positions, previousPosition, localStepCount)
-      debugLog1({subSumEven, subSumOdd})
-      subSum = !(isEvenStart ^ totalCountIsEven) ? subSumEven : subSumOdd
+    if (loopStart === totalCount) {
+      subSum = 1
     } else {
-      subSum = !(isEvenStart ^ totalCountIsEven) ? sumEven : sumOdd
+      const isEvenStart = i % 2 === 0
+      const localStepCount = totalCount - i
+
+      if (localStepCount < stepsToFull) {
+        let {sumEven: subSumEven, sumOdd: subSumOdd} = processMap(emptyMap, positions, previousPosition, localStepCount)
+        debugLog1({subSumEven, subSumOdd})
+        subSum = !(isEvenStart ^ totalCountIsEven) ? subSumEven : subSumOdd
+      } else {
+        subSum = !(isEvenStart ^ totalCountIsEven) ? sumEven : sumOdd
+      }
     }
     // debugLog1({ i, subSum })
     if (isScalingUp) {
-      sum += ((level * 2) + 1) * subSum
+      sum += level * subSum
     } else {
       sum += subSum
     }
@@ -157,7 +158,7 @@ async function main () {
 
   const dataStr = await fs.promises.readFile(filePath, 'utf8')
 
-  const lines = dataStr.split("\n");
+  const lines = dataStr.replace('\r', '').split('\n')
   let map = lines.map(line => line.replace('S', '.').split(''))
   // debugLog({map})
   let emptyMap = _.cloneDeep(map)
@@ -181,15 +182,14 @@ async function main () {
   mapWidth = emptyMap[0].length;
   mapHeight = emptyMap.length;
   halfMapWidth = (mapWidth - 1) / 2
-  debugLog({ mapWidth, mapHeight })
+  debugLog({ mapWidth, mapHeight, halfMapWidth })
 
   debugLog('center')
   // case center
   {
-    // let { sumEven, sumOdd, stepsToFull } = processMap(emptyMap, positions, previousPosition, Infinity)
-    // debugLog({sumEven, sumOdd, stepsToFull})
-    // sum += totalCount % 2 === 0 ? sumEven : sumOdd
-    sum += sumLinearRepeatingParts(emptyMap, positions, totalCount, 0)
+    let { sumEven, sumOdd } = processMap(emptyMap, positions, previousPosition, totalCount)
+    debugLog({sumEven, sumOdd})
+    sum += totalCount % 2 === 0 ? sumEven : sumOdd
   }
 
   debugLog('linear')
