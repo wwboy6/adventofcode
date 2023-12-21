@@ -36,13 +36,6 @@ function prcocessOneStep(emptyMap, positions, previousPosition) {
       //
       for (let dir of directions) {
         const newPos = lib.v2Add(pos, dir)
-        // //
-        // let xx = newPos.x % mapWidth
-        // if (xx < 0) xx += mapWidth
-        // let yy = newPos.y % mapHeight
-        // if (yy < 0) yy += mapHeight
-        // const pp = {x: xx, y: yy}
-        // const value = lib.getMap(emptyMap, pp)
         //
         const value = lib.getMap(emptyMap, newPos)
         // TODO: ignore out of map checking
@@ -105,32 +98,30 @@ function processMap(emptyMap, positions, previousPosition, totalCount) {
   return {sumEven, sumOdd, stepsToFull: i - 1}
 }
 
-function sumLinearRepeatingParts(emptyMap, positions, totalCount, loopStart, isScalingUp) {
+function sumRepeatingParts(emptyMap, positions, totalCount, loopStart, isCorner) {
   if (totalCount < loopStart) return 0
-  const totalCountIsEven = totalCount % 2 === 0
   let sum = 0
   let previousPosition = {}
+  // preparing to determine the fill up case
   let { sumEven, sumOdd, stepsToFull } = processMap(emptyMap, positions, previousPosition, Infinity)
   debugLog1({sumEven, sumOdd, stepsToFull})
+  // sum up result for each levels
   let level = 1
-  for (let i = loopStart; i <= totalCount; i += mapWidth) {
+  for (let firstStepForSubMap = loopStart; firstStepForSubMap <= totalCount; firstStepForSubMap += mapWidth) {
     let subSum
-    if (loopStart === totalCount) {
-      subSum = 1
+    const localStepCount = totalCount - firstStepForSubMap
+    const localEven = localStepCount % 2 === 0
+    if (localStepCount < stepsToFull) {
+      // process for un-filled case
+      let {sumEven: subSumEven, sumOdd: subSumOdd} = processMap(emptyMap, positions, previousPosition, localStepCount)
+      debugLog1({subSumEven, subSumOdd})
+      subSum = localEven ? subSumEven : subSumOdd
     } else {
-      const isEvenStart = i % 2 === 0
-      const localStepCount = totalCount - i
-
-      if (localStepCount < stepsToFull) {
-        let {sumEven: subSumEven, sumOdd: subSumOdd} = processMap(emptyMap, positions, previousPosition, localStepCount)
-        debugLog1({subSumEven, subSumOdd})
-        subSum = !(isEvenStart ^ totalCountIsEven) ? subSumEven : subSumOdd
-      } else {
-        subSum = !(isEvenStart ^ totalCountIsEven) ? sumEven : sumOdd
-      }
+      // shortcut for filled case
+      subSum = localEven ? sumEven : sumOdd
     }
     // debugLog1({ i, subSum })
-    if (isScalingUp) {
+    if (isCorner) {
       sum += level * subSum
     } else {
       sum += subSum
@@ -172,6 +163,9 @@ async function main () {
     }
   }
   debugLog({ pos })
+  // this is an object of hashed y with set of hashed x
+  // to optimize the checking if a point is already
+  // in this data
   let positions = { [pos.y]: new Set([ pos.x ]) }
   let previousPosition = {}
 
@@ -184,6 +178,46 @@ async function main () {
   halfMapWidth = (mapWidth - 1) / 2
   debugLog({ mapWidth, mapHeight, halfMapWidth })
 
+  // after many steps, divide the whole picture into sub-maps
+  // classify them into and 8 cases
+  // here is the Top half of the whole picture
+  //           _ 
+  //          |U|
+  //         . . .
+  //      UL   U   UR
+  //   .       .       .
+  //  _        _        _ 
+  // |L| ..L. |S| .R.. |R|
+  //  .        .        .
+  //
+  // all sub-maps "orthogornal" to the starting one are
+  // Up (U), Left (L), Right (R), Bottom (B) - 4 cases
+  // each of them would start having their first step
+  // at the middle of one edge (lower edge for the case of U)
+  //
+  // all other sub-maps are "corner" cases,
+  // UL (Upper Left), UR, BL, BR - 4 cases
+  // each of them would start having their first step
+  // at the corner of the map
+  // the are further divided into different "level"
+  // w.r.t. steps required that they would be reached
+  // first level involve 1 map for each case
+  // second level invole 2 maps for each case, and so on:
+  //
+  //     ... 3 U ...
+  //   ... 3 2 U ...
+  // ... 3 2 1 U ...
+  // ... L L L S ...
+  //
+  // this algorithm would first calculate reqired step to make
+  // the first step of the sub-map, then calculate the "local steps"
+  // for each submap, run through "processMap", and get the answer
+  // w.r.t. the local step is odd or even
+  //
+  // the function "sumRepeatingParts" would first determine the step
+  // required to fully fill up the sub-map, and shortcut the result
+  // for fully filled cases
+
   debugLog('center')
   // case center
   {
@@ -192,7 +226,7 @@ async function main () {
     sum += totalCount % 2 === 0 ? sumEven : sumOdd
   }
 
-  debugLog('linear')
+  debugLog('orthgonal')
   // case left, right, up, down
   let startPositions = [
     { x: mapWidth - 1, y: halfMapWidth},
@@ -202,10 +236,10 @@ async function main () {
   ]
   for (let pos of startPositions) {
     positions = { [pos.y]: new Set([ pos.x ]) }
-    sum += sumLinearRepeatingParts(emptyMap, positions, totalCount, halfMapWidth + 1)
+    sum += sumRepeatingParts(emptyMap, positions, totalCount, halfMapWidth + 1)
   }
 
-  debugLog('scaling')
+  debugLog('corner')
   // case ul, ur, bl, br
   startPositions = [
     { x: mapWidth - 1, y: mapHeight - 1},
@@ -215,15 +249,8 @@ async function main () {
   ]
   for (let pos of startPositions) {
     positions = { [pos.y]: new Set([ pos.x ]) }
-    sum += sumLinearRepeatingParts(emptyMap, positions, totalCount, (halfMapWidth + 1) * 2, true)
+    sum += sumRepeatingParts(emptyMap, positions, totalCount, (halfMapWidth + 1) * 2, true)
   }
-
-
-  // let sum = Object.values(maps).reduce((sum, map) => {
-  //   return sum + map.reduce((sum2, line) => {
-  //     return sum2 + line.filter(c => c === 'O').length
-  //   }, 0)
-  // }, 0)
 
   console.log('====')
   console.log({sum})
