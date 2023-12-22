@@ -76,10 +76,10 @@ function processMap(emptyMap, positions, previousPosition, totalCount) {
   let sumEven = countPositions(positions)
   let sumOdd = 0
   let subSum
-  let i
-  for (i = 0; i < totalCount; ++i) {
-    // if (i % 2 === 0) debugLog1({ i, subSum })
-    const isEvenStep = i % 2 === 1
+  let step
+  for (step = 0; step < totalCount; ++step) {
+    // if (step % 2 === 0) debugLog1({ step, subSum })
+    const isEvenStep = step % 2 === 1
     // positions = prcocessOneStep(maps, emptyMap, positions, isEvenStep ? 'X' : 'O')
     const newPositions = prcocessOneStep(emptyMap, positions, previousPosition)
     previousPosition = positions
@@ -95,7 +95,7 @@ function processMap(emptyMap, positions, previousPosition, totalCount) {
       sumOdd += subSum
     }
   }
-  return {sumEven, sumOdd, stepsToFull: i - 1}
+  return {sumEven, sumOdd, stepsToFull: step}
 }
 
 function sumRepeatingParts(emptyMap, positions, totalCount, loopStart, isCorner) {
