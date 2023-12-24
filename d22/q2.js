@@ -37,6 +37,7 @@ function findBrickMins(bricks) {
 }
 
 function fallDown(bricks, checkFall = false) {
+  let fallCount = 0
   // let unsettledBricks = _.cloneDeep(bricks)
   unsettledBricks = [...bricks]
   //
@@ -67,7 +68,8 @@ function fallDown(bricks, checkFall = false) {
     if (zDiff) {
       if (checkFall) {
         //throw new Error('really have to fall!!')
-        return true
+        // return true
+        ++fallCount
       }
       lowestBricks[0][2] -= zDiff
       lowestBricks[1][2] -= zDiff
@@ -82,6 +84,7 @@ function fallDown(bricks, checkFall = false) {
     // add to settle
     settledBricks.push(lowestBricks)
   }
+  return fallCount
 }
 
 let maxes
@@ -120,10 +123,8 @@ async function main () {
   let sum = 0
   for (let brick of bricks) {
     let newBricks = bricks.filter(b => b !== brick)
-    // newBricks = _.cloneDeep(newBricks)
-    if (!fallDown(newBricks, true)) {
-      ++sum
-    }
+    newBricks = _.cloneDeep(newBricks)
+    sum += fallDown(newBricks, true)
   }
 
   console.log('====')
