@@ -121,7 +121,10 @@ async function main () {
   // search all sortest path combination and stat them
   const result = searchNarrowLinks(connections, 3)
   debugLog(result)
-  
+
+  // last loggings of my run:
+  // [["gqr-vbk",195793],["klj-scr",189353],["mxv-sdv",168797],["klj-tpv",72437],["klj-ntd",72092],["hcg-sdv",70921],["hdn-sdv",66702],["gkf-vbk",66594],["hbq-scr",58176],["gqr-hls",55952]]
+  // { sortedLabels: [ 'gqr-vbk', 'klj-scr', 'mxv-sdv' ] }
 
   console.log('====')
   // console.log({sum})
