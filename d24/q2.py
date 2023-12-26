@@ -112,9 +112,7 @@ def halfGE(f, j, isInv = False):
   #        | 0 1 0  0 t2  0     0     0 v-vy2 |
   #        |_0 0 1  0  0 t2     0     0 w-vz2_|
   #
-  # Let x0 to be the middle of the volume [300000000000000, 300000000000000, 300000000000000]
-  # with the avg speed of all stones avg(vi)
-  # and set ti to be approcimate time from x0 to p0  
+  # setup x0 for a solvable J(x)^-1
   # then solve this equation by gaussian elimination: J(x0)y0 = -F(x0)
   # and find x1 by x0 - J(x0)^-1 * F(x0)
 threshold = 0.1
