@@ -3,8 +3,6 @@ const readline = require('readline')
 const path = require('path')
 const lib = require('../lib/lib')
 const _ = require('lodash')
-const { devNull } = require('os')
-const { takeCoverage } = require('v8')
 
 // const inputFilePath = 'input-test.txt'
 // const boundMin = 7
