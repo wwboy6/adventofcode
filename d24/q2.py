@@ -1,7 +1,7 @@
-import fileinput, re, z3
+import fileinput, re
 import math
 
-recordCount = 5
+recordCount = 3
 
 datas = [ list( map( int, re.findall( "-?\d+", l ) ) )
       for index, l in enumerate(fileinput.input()) if index < recordCount ]
