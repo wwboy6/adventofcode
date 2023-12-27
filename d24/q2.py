@@ -123,11 +123,11 @@ while True:
   f = F(currX)
   # print(f)
   # check if f is close to zero
-  minAbsF = max( abs(fv) for fv in f )
-  if minAbsF < threshold:
-    print('minAbsF', minAbsF)
+  maxAbsF = max( abs(fv) for fv in f )
+  if maxAbsF < threshold:
+    print('maxAbsF', maxAbsF)
     break
-  if loop % printInterval == 1: print('minAbsF', minAbsF)
+  if loop % printInterval == 1: print('maxAbsF', maxAbsF)
   j = J(currX)
   # gaussian elimination
   # left to right, top to bottom
